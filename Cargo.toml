@@ -14,7 +14,7 @@ rustdoc-args = ["--cfg", "docsrs"]
 
 [dependencies]
 async-trait = "0.1.57"
-axum-core = "0.2.7"
+axum-core = "0.3.0-rc.3"
 base64 = "0.13"
 http = "0.2"
 

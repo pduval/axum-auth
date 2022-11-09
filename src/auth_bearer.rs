@@ -1,6 +1,6 @@
 use async_trait::async_trait;
-use axum_core::extract::{FromRequest, RequestParts};
-use http::{header::AUTHORIZATION, StatusCode};
+use axum_core::extract::{FromRequestParts};
+use http::{header::AUTHORIZATION, StatusCode, request::Parts};
 
 /// Bearer token extractor which contains the innards of a bearer header as a string
 ///
@@ -39,16 +39,16 @@ use http::{header::AUTHORIZATION, StatusCode};
 pub struct AuthBearer(pub String);
 
 #[async_trait]
-impl<B> FromRequest<B> for AuthBearer
+impl<S> FromRequestParts<S> for AuthBearer
 where
-    B: Send,
+    S: Send + Sync,
 {
     type Rejection = (StatusCode, &'static str);
 
-    async fn from_request(req: &mut RequestParts<B>) -> std::result::Result<Self, Self::Rejection> {
+    async fn from_request_parts(parts: &mut Parts, _state: &S) -> std::result::Result<Self, Self::Rejection> {
         // Get authorisation header
-        let authorisation = req
-            .headers()
+        let authorisation = parts
+            .headers
             .get(AUTHORIZATION)
             .ok_or((StatusCode::BAD_REQUEST, "`Authorization` header is missing"))?
             .to_str()
